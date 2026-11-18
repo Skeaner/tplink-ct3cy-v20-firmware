@@ -64,7 +64,45 @@
 
 ---
 
-### 4. 功能流量与使用说明
+### 4. 固件生成工具（Windows）
+
+仓库提供 `firmware_builder.py` 图形工具，可通过文件选择框选择编程器备份、官方 TL-IPC43AN-4 V4.0 升级固件和输出位置。工具只生成固件文件，不会直接刷写设备，也不会修改输入文件。
+
+#### 从 Python 源码运行
+
+1. 安装带 Tkinter 的 Python 3.10 或更高版本。
+2. 在仓库目录打开终端，运行：
+
+   ```powershell
+   python firmware_builder.py
+   ```
+
+3. 依次选择原机 8 MiB 编程器备份、官方升级固件和新固件保存位置。
+4. 工具会验证备份的 M1CT 头部、有效载荷长度/结尾和原 MD5，以及官方固件的镜像头和 ISP 型号/版本标记。校验通过后，按上述分区偏移组装固件，修改 `devName`/`hwVer`，重算 M1CT 有效载荷 MD5，并验证写出文件。
+5. 生成后请核对界面显示的输出路径和 SHA-256。刷机及恢复出厂设置仍需按本文前述步骤手动完成。
+
+工具只支持本文记录的 CT3CY V2.0 / M1CT 布局。其他版本或布局不匹配时会停止，不应绕过校验强行生成。设备专属字段会从备份保留；不要分享含有设备标识或密钥的备份文件。
+
+#### 可选：打包为 EXE
+
+源码文件仍是完整、可检查和可直接运行的程序。若需要免安装运行，可在已安装 Python 的 Windows 环境中执行：
+
+```powershell
+python -m pip install pyinstaller
+python -m PyInstaller --onefile --windowed firmware_builder.py
+```
+
+生成的程序位于 `dist\firmware_builder.exe`。PyInstaller 仅用于可选打包；如 Windows 显示未知发布者提示，应只运行自己从本仓库源码构建且信任的程序。
+
+运行源码单元测试：
+
+```powershell
+python -m unittest discover -s tests -v
+```
+
+---
+
+### 5. 功能流量与使用说明
 
 - 本地流媒体: Web 页面一切正常，支持 ONVIF 和 RTSP 正常拉流，可完美对接本地 NVR。
 - TP-LINK 物联 APP:
